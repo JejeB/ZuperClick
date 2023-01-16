@@ -5,7 +5,7 @@ import * as PIXI from 'pixi.js';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore,doc,setDoc,onSnapshot, query, collection, QuerySnapshot } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,6 +22,15 @@ const firebaseConfig = {
 // Initialize Firebase
 const fire_app = initializeApp(firebaseConfig);
 const db = getFirestore(fire_app);
+
+//Get Update
+const q = query(collection(db,"testBoard"));
+const unsub = onSnapshot(q,(querySnapshot)=>{
+  querySnapshot.forEach((doc)=>{
+    console.log(doc.id + " "+doc.data().color);
+  });
+
+})
 
 //Pixi APP
 const size = 600;
@@ -63,5 +72,8 @@ function onPointerOut() {
 }
 
 function onPointerTap(x,y) {
-  console.log(x + " "+y);
+  let doc_id = x+ ":"+y;
+  console.log(doc_id);
+  const cityRef = doc(db, 'testBoard', doc_id);
+  setDoc(cityRef, { color: 0x32a852});
 }
