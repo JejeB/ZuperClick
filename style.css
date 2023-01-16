@@ -2,3 +2,22 @@ canvas{
   border: 0.1em solid black;
   border-radius: 1%;
 }
+.select {
+  height: 1.5em;
+  width: 2em;
+  display: inline-block;
+}
+
+.select:hover{
+  filter: brightness(50%);
+}
+
+#selected{
+  height: 3em;
+  width: 3em;
+  display: inline-block;
+}
+
+h1{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
