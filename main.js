@@ -23,20 +23,12 @@ const firebaseConfig = {
 const fire_app = initializeApp(firebaseConfig);
 const db = getFirestore(fire_app);
 
-//Get Update
-const q = query(collection(db,"testBoard"));
-const unsub = onSnapshot(q,(querySnapshot)=>{
-  querySnapshot.forEach((doc)=>{
-    console.log(doc.id + " "+doc.data().color);
-  });
-
-})
-
 //Pixi APP
 const size = 600;
 
 const nb = 50;
 const tile_size = size/nb;
+const tiles_refs = {};
 let pixi_app = new PIXI.Application({ width: size, height: size });
 document.body.appendChild(pixi_app.view);
 
@@ -49,11 +41,15 @@ for(let y=0;y<nb;y++){
 
 function createTile(x,y){
   const tile = new PIXI.Graphics();
+  const _id = x+":"+y;
 
+  // Init
   tile.interactive =true;
   tile.on('pointerover',onPointerHover,tile)
   tile.on('pointerout',onPointerOut,tile)
-  tile.on('pointertap',()=>{onPointerTap(x,y)},tile)
+  tile.on('pointertap',()=>{onPointerTap(_id)},tile)
+  tiles_refs[_id]=tile;
+
   //Draw tile
   tile.beginFill(0xFFFFFF);
   tile.drawRect(x*tile_size,y*tile_size,tile_size,tile_size);
@@ -64,16 +60,25 @@ function createTile(x,y){
 
 
 function onPointerHover() {
-  this.tint = 0x666666;
+  this.alpha = 0.5;
 }
 
 function onPointerOut() {
-  this.tint = 0xFFFFFF;
+  this.alpha = 1;
 }
 
-function onPointerTap(x,y) {
-  let doc_id = x+ ":"+y;
-  console.log(doc_id);
-  const cityRef = doc(db, 'testBoard', doc_id);
+function onPointerTap(id) {
+  console.log(id);
+  const cityRef = doc(db, 'testBoard', id);
   setDoc(cityRef, { color: 0x32a852});
 }
+
+//Get Update
+const q = query(collection(db,"testBoard"));
+const unsub = onSnapshot(q,(querySnapshot)=>{
+  querySnapshot.forEach((doc)=>{
+    console.log(doc.id + " "+doc.data().color);
+    tiles_refs[doc.id].tint = doc.data().color;
+  });
+
+})
